@@ -152,12 +152,12 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "h5py" },
-    { name = "hdmf-zarr" },
-    { name = "ndx-events" },
-    { name = "ndx-hed" },
+    { name = "hdmf-zarr", specifier = ">=0.13" },
+    { name = "ndx-events", specifier = ">=0.4,<0.5" },
+    { name = "ndx-hed", specifier = ">=0.2,<0.3" },
     { name = "numpy" },
     { name = "pandas" },
-    { name = "pynwb" },
+    { name = "pynwb", specifier = ">=3.1,<4" },
     { name = "scipy" },
 ]
 

@@ -26,10 +26,15 @@ dependencies = [
     "pandas",
     "h5py",
     "scipy",
-    "pynwb",
-    "hdmf-zarr",
-    "ndx-events",
-    "ndx-hed",
+    # pynwb 4.0 moved events/HED into core, so the standalone ndx-events
+    # NdxEventsNWBFile collides with the native `events` field
+    # ("names duplicated: ['events']"). This library targets the standalone
+    # ndx-events/ndx-hed on the pynwb 3.x line; cap until it migrates to
+    # pynwb's built-in events/HED.
+    "pynwb>=3.1,<4",
+    "hdmf-zarr>=0.13",
+    "ndx-events>=0.4,<0.5",
+    "ndx-hed>=0.2,<0.3",
 ]
 
 [dependency-groups]

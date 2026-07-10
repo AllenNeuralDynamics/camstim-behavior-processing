@@ -90,11 +90,40 @@ def _zscore_threshold_1d(data, threshold=10.0):
     return out
 
 
+def _encoder_from_pkl(pkl: dict, encoder_keys=("behavior",)) -> dict:
+    """Return the first rotary encoder found under the given pkl item keys.
+
+    Parameters
+    ----------
+    pkl : loaded behavior pickle.
+    encoder_keys : the ``items`` sub-keys to search, in order. Change-detection
+        sessions store the encoder under ``behavior``; passive SweepStim
+        sessions store it under ``foraging`` (falling back to ``behavior``).
+
+    Returns
+    -------
+    The encoder dict (``vsig`` / ``vin`` / ``dx``).
+
+    Raises
+    ------
+    KeyError : if no encoder is found under any of ``encoder_keys``.
+    """
+    items = pkl.get("items") or {}
+    for key in encoder_keys:
+        encoders = (items.get(key) or {}).get("encoders") or []
+        if encoders:
+            return encoders[0]
+    raise KeyError(
+        f"No encoder found under items.{{{','.join(encoder_keys)}}}.encoders"
+    )
+
+
 def compute_running_speed(
     pkl: dict,
     time: np.ndarray,
     lowpass: bool = True,
     zscore_threshold: float = 10.0,
+    encoder_keys=("behavior",),
 ) -> pd.DataFrame:
     """Compute linear running speed (cm/s) from the pkl encoder + sync times.
 
@@ -110,13 +139,16 @@ def compute_running_speed(
     time : 1d sync-file vsync falling-edge times (s), one per frame.
     lowpass : whether to apply the 4 Hz Butterworth filter.
     zscore_threshold : outlier rejection threshold in SDs.
+    encoder_keys : ``items`` sub-keys to search for the encoder, in order
+        (default ``("behavior",)``; the SweepStim path passes
+        ``("foraging", "behavior")``).
 
     Returns
     -------
     DataFrame indexed by ``timestamps`` with columns ``speed``, ``dx``,
     ``v_sig``, ``v_in`` (length-matched to ``time``).
     """
-    enc = pkl["items"]["behavior"]["encoders"][0]
+    enc = _encoder_from_pkl(pkl, encoder_keys)
     v_sig = np.asarray(enc["vsig"])
     v_in = np.asarray(enc["vin"])
     dx_raw = np.asarray(enc["dx"])

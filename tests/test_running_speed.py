@@ -5,6 +5,7 @@ import unittest
 import numpy as np
 
 from camstim_behavior_processing.load_data.running_speed import (
+    _encoder_from_pkl,
     compute_running_speed,
 )
 
@@ -61,6 +62,27 @@ class ComputeRunningSpeedTest(unittest.TestCase):
     def test_vin_shorter(self):
         """A frame array longer than the encoder trims the time vector."""
         self.assertEqual(len(_run(28, 30)), 28)
+
+
+class EncoderLookupTest(unittest.TestCase):
+    """Tests for :func:`_encoder_from_pkl` (encoder-key fallback)."""
+
+    def test_behavior_default(self):
+        """The default key finds the behavior encoder."""
+        enc = {"vsig": [1], "vin": [5], "dx": [0]}
+        pkl = {"items": {"behavior": {"encoders": [enc]}}}
+        self.assertIs(_encoder_from_pkl(pkl), enc)
+
+    def test_foraging_fallback(self):
+        """The SweepStim keys find the foraging encoder first."""
+        enc = {"vsig": [1], "vin": [5], "dx": [0]}
+        pkl = {"items": {"foraging": {"encoders": [enc]}}}
+        self.assertIs(_encoder_from_pkl(pkl, ("foraging", "behavior")), enc)
+
+    def test_missing_raises(self):
+        """No encoder under any key raises KeyError."""
+        with self.assertRaises(KeyError):
+            _encoder_from_pkl({"items": {}}, ("foraging", "behavior"))
 
 
 if __name__ == "__main__":

@@ -666,10 +666,15 @@ def build_events_table(pkl, ts):
 
     # ---- lick_classification, bout_start, reward_type ----
     # Initialized here; filled by _classify_licks() and _classify_rewards()
-    # after intervals are built.
-    events_df['lick_classification'] = np.nan
-    events_df['bout_start'] = np.nan
-    events_df['reward_type'] = np.nan
+    # after intervals are built. Use object dtype (not float): these hold
+    # strings/bools once classified, and pandas >= 3.0 raises rather than
+    # silently upcasting a float column on string assignment.
+    events_df['lick_classification'] = pd.Series(
+        np.nan, index=events_df.index, dtype=object)
+    events_df['bout_start'] = pd.Series(
+        np.nan, index=events_df.index, dtype=object)
+    events_df['reward_type'] = pd.Series(
+        np.nan, index=events_df.index, dtype=object)
 
     # Ensure consistent columns
     for col in ['image_name', 'orientation', 'reward_volume',

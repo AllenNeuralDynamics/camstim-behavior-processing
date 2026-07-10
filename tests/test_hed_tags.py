@@ -63,5 +63,38 @@ class TrialHedTest(unittest.TestCase):
         )
 
 
+class SweepStimHedTest(unittest.TestCase):
+    """Tests for the passive SweepStim HED helpers."""
+
+    def test_hed_safe_label(self):
+        """Non-word characters are replaced with underscores."""
+        self.assertEqual(H.hed_safe_label("a b.c-d"), "a_b_c_d")
+
+    def test_movie_hed(self):
+        """A movie clip HED nests a sanitised Movie label."""
+        hed = H.sweepstim_movie_hed("clip one")
+        self.assertIn("(Movie, Label/clip_one)", hed)
+
+    def test_epoch_hed_spontaneous(self):
+        """The spontaneous epoch maps to its fixed fragment."""
+        self.assertEqual(
+            H.sweepstim_epoch_hed("spontaneous"),
+            H.SWEEPSTIM_SPONTANEOUS_EPOCH_HED,
+        )
+
+    def test_epoch_hed_passive(self):
+        """The passive_viewing fallback maps to its fixed fragment."""
+        self.assertEqual(
+            H.sweepstim_epoch_hed("passive_viewing"),
+            H.SWEEPSTIM_PASSIVE_EPOCH_HED,
+        )
+
+    def test_epoch_hed_clip(self):
+        """A clip epoch nests both the task and Movie labels."""
+        hed = H.sweepstim_epoch_hed("natural_movie_one")
+        self.assertIn("Label/passive_viewing", hed)
+        self.assertIn("(Movie, Label/natural_movie_one)", hed)
+
+
 if __name__ == "__main__":
     unittest.main()

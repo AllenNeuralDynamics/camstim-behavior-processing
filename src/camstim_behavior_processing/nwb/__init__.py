@@ -50,6 +50,12 @@ from .stimulus import (
     build_natural_movie_one_presentations,
     build_stimulus_presentations,
 )
+from .sweepstim import (
+    assemble_sweepstim_nwbfile,
+    build_sweepstim_nwbfile,
+    build_sweepstim_sidecar,
+    package_sweepstim_nwb,
+)
 
 __all__ = [
     "add_running_speed",
@@ -67,6 +73,10 @@ __all__ = [
     "build_nwbfile",
     "assemble_nwbfile",
     "package_nwb",
+    "assemble_sweepstim_nwbfile",
+    "build_sweepstim_nwbfile",
+    "build_sweepstim_sidecar",
+    "package_sweepstim_nwb",
     "HED_SCHEMA_VERSION",
 ]
 

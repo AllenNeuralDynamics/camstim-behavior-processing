@@ -15,6 +15,8 @@ constants and two pure string helpers.
 
 from __future__ import annotations
 
+import re
+
 import pandas as pd
 
 #: HED base schema version every tag in this module is written against.
@@ -548,3 +550,102 @@ def trial_hed(row: pd.Series) -> str:
     else:
         key = "no_outcome"
     return TRIAL_OUTCOME_HED[key]
+
+
+# ── Passive SweepStim (movie / gratings) HED ───────────────────────────
+# The passive path (sweepstim) presents movie/grating clips with no trial
+# structure. Its interval types are only ``epoch`` and
+# ``stimulus_presentation``; the epoch label is either a clip name, the
+# ``passive_viewing`` fallback, or a ``spontaneous`` gap.
+SWEEPSTIM_PASSIVE_TASK = "passive_viewing"
+
+#: HED for a spontaneous (gray-screen) gap epoch in a passive session.
+SWEEPSTIM_SPONTANEOUS_EPOCH_HED = (
+    "Experimental-procedure, (Task, Label/spontaneous)"
+)
+
+#: HED for the whole-session ``passive_viewing`` fallback epoch (used when a
+#: session declares no per-clip ``display_sequence`` windows).
+SWEEPSTIM_PASSIVE_EPOCH_HED = (
+    "Experimental-procedure, (Task, Label/passive_viewing)"
+)
+
+# Descriptions for the passive-session-specific columns, exported by the
+# SweepStim sidecar builder.
+SWEEPSTIM_COLUMN_DESC = {
+    "movie_name": "Movie clip label.",
+    "movie_frame_index": "Frame index within movie clip.",
+    "movie_repeat": "Repeat index within clip.",
+    "stim_block": "Stimulus block index from pkl top-level stimuli list.",
+}
+
+# HED templates (with ``#`` placeholders) for the passive-session columns.
+SWEEPSTIM_COLUMN_HED = {
+    "movie_frame_index": "Label/movie_frame_index-#",
+    "movie_repeat": "Label/movie_repeat-#",
+    "stim_block": "Label/stim_block-#",
+}
+
+# Levels for the passive-session ``interval_type`` discriminator.
+SWEEPSTIM_INTERVAL_TYPE_DESC = {
+    "epoch": "Session-level epoch row.",
+    "stimulus_presentation": "Per-frame movie presentation.",
+}
+
+
+def hed_safe_label(name: str) -> str:
+    """Return ``name`` with non-alphanumeric characters replaced by ``_``.
+
+    HED ``Label/`` values may only contain word characters, so clip names
+    (which come from Windows-style stimulus paths) are sanitised before use.
+
+    Parameters
+    ----------
+    name : the raw label (e.g. a movie clip basename).
+
+    Returns
+    -------
+    A HED-safe label string.
+    """
+    return re.sub(r"[^A-Za-z0-9_]", "_", str(name))
+
+
+def sweepstim_movie_hed(clip: str) -> str:
+    """Compose the HED string for one passive movie/grating presentation.
+
+    Parameters
+    ----------
+    clip : the movie clip label (carried in the ``movie_name`` column).
+
+    Returns
+    -------
+    The composed HED tag string.
+    """
+    return (
+        "Sensory-event, Visual-presentation, "
+        f"(Movie, Label/{hed_safe_label(clip)})"
+    )
+
+
+def sweepstim_epoch_hed(name: str) -> str:
+    """Return the epoch-row HED string for a passive-session epoch.
+
+    Parameters
+    ----------
+    name : the epoch label — ``"spontaneous"``, ``"passive_viewing"``, or a
+        movie clip name.
+
+    Returns
+    -------
+    The composed HED tag string. Clip epochs nest the ``passive_viewing``
+    task tag with a ``Movie`` label; the two reserved names map to their
+    fixed fragments.
+    """
+    if name == "spontaneous":
+        return SWEEPSTIM_SPONTANEOUS_EPOCH_HED
+    if name == SWEEPSTIM_PASSIVE_TASK:
+        return SWEEPSTIM_PASSIVE_EPOCH_HED
+    return (
+        "Experimental-procedure, (Task, Label/passive_viewing), "
+        f"(Movie, Label/{hed_safe_label(name)})"
+    )

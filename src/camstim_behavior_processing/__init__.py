@@ -17,15 +17,28 @@ does not require pynwb.
 
 from __future__ import annotations
 
-from .load_data import SessionData, build_trials_and_events
+from .load_data import (
+    SessionData,
+    SweepStimData,
+    build_sweepstim_session,
+    build_trials_and_events,
+    classify_sweepstim_session,
+)
 
 __all__ = [
     "build_trials_and_events",
     "SessionData",
+    "SweepStimData",
+    "build_sweepstim_session",
+    "classify_sweepstim_session",
     "compute_running_speed",
     "package_nwb",
     "build_nwbfile",
+    "package_sweepstim_nwb",
 ]
+
+# pynwb-dependent names re-exported lazily (see __getattr__).
+_LAZY_NWB_NAMES = ("package_nwb", "build_nwbfile", "package_sweepstim_nwb")
 
 
 def __getattr__(name):
@@ -34,7 +47,7 @@ def __getattr__(name):
         from .load_data import compute_running_speed
 
         return compute_running_speed
-    if name in ("package_nwb", "build_nwbfile"):
+    if name in _LAZY_NWB_NAMES:
         from . import nwb
 
         return getattr(nwb, name)

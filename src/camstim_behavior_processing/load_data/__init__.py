@@ -18,6 +18,11 @@ from __future__ import annotations
 
 from .loaders import load_stim_pkl
 from .session_data import SessionData
+from .sweepstim import (
+    SweepStimData,
+    build_sweepstim_session,
+    classify_sweepstim_session,
+)
 from .trials_events import build_trials_and_events
 
 __all__ = [
@@ -25,6 +30,9 @@ __all__ = [
     "SessionData",
     "compute_running_speed",
     "load_stim_pkl",
+    "SweepStimData",
+    "build_sweepstim_session",
+    "classify_sweepstim_session",
 ]
 
 

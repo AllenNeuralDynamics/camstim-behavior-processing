@@ -4,19 +4,32 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "camstim-behavior-processing"
-description = "Generated from aind-library-template"
+description = "Turn a raw camstim change-detection session (*_stim.pkl + *_sync.h5) into analysis-ready pandas tables and a complete HED-annotated NWB file."
 license = "MIT"
 requires-python = ">=3.10"
 authors = [
     {name = "Allen Institute for Neural Dynamics"}
 ]
 classifiers = [
-    "Programming Language :: Python :: 3"
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
 ]
 readme = "README.md"
 version = "0.0.0"
 
 dependencies = [
+    "numpy",
+    "pandas",
+    "h5py",
+    "scipy",
+    "pynwb",
+    "hdmf-zarr",
+    "ndx-events",
+    "ndx-hed",
 ]
 
 [dependency-groups]
@@ -32,6 +45,9 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+camstim_behavior_processing = ["py.typed"]
 
 [tool.black]
 line-length = 79

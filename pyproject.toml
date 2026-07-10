@@ -47,7 +47,12 @@ dev = [
 where = ["src"]
 
 [tool.setuptools.package-data]
-camstim_behavior_processing = ["py.typed"]
+camstim_behavior_processing = [
+    "py.typed",
+    "data_loading_and_formatting_code/*.py",
+    "data_loading_and_formatting_code/ndx_change_detection_task/__init__.py",
+    "data_loading_and_formatting_code/ndx_change_detection_task/_specs/*.yaml",
+]
 
 [tool.black]
 line-length = 79
@@ -90,5 +95,13 @@ profile = "black"
 skip = [".conda", ".venv"]
 
 [tool.interrogate]
-exclude = ["setup.py", "docs", "build", ".conda"]
+exclude = [
+    "setup.py",
+    "docs",
+    "build",
+    ".conda",
+    # Adopted-from-capsule extractor; not yet refactored to this repo's style.
+    # Glob (not a path) so it matches regardless of OS path separator.
+    "*data_loading_and_formatting_code*",
+]
 fail-under = 100

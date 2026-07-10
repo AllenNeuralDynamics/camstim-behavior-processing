@@ -5,8 +5,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
 
-import numpy as np
-
 from camstim_behavior_processing import nwb as pkg
 from camstim_behavior_processing.nwb import (
     _write_nwb,
@@ -22,10 +20,8 @@ def _assembled():
     """Assemble an NWBFile from the shared fixtures."""
     return assemble_nwbfile(
         F.make_pkl(),
-        F.make_events_df(),
-        F.make_intervals_df(),
+        F.make_session(),
         F.make_wheel_df(),
-        F.make_task_parameters(),
         metadata={"institution": "AIND"},
     )
 
@@ -82,15 +78,11 @@ class PackageNwbTest(unittest.TestCase):
 
     def _patches(self):
         """Patch the raw-data loaders used inside package_nwb."""
-        built = {
-            "events_df": F.make_events_df(),
-            "intervals_df": F.make_intervals_df(),
-            "timestamp_data": {"stim_vsync_fall": np.linspace(0, 11, 660)},
-            "task_parameters": F.make_task_parameters(),
-        }
         return (
             mock.patch.object(
-                pkg, "build_trials_and_events", return_value=built
+                pkg,
+                "build_trials_and_events",
+                return_value=F.make_session(),
             ),
             mock.patch.object(pkg, "load_stim_pkl", return_value=F.make_pkl()),
             mock.patch.object(

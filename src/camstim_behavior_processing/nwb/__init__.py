@@ -36,6 +36,7 @@ from pynwb import NWBHDF5IO
 
 from ..load_data.loaders import load_stim_pkl
 from ..load_data.running_speed import compute_running_speed
+from ..load_data.session_data import SessionData
 from ..load_data.trials_events import build_trials_and_events
 from .acquisition import add_running_speed
 from .epochs import build_epoch_lookup
@@ -78,10 +79,8 @@ def _warm_up_n(pkl: dict) -> int:
 
 def assemble_nwbfile(
     pkl: dict,
-    events_df: pd.DataFrame,
-    intervals_df: pd.DataFrame,
+    session: SessionData,
     wheel_df: pd.DataFrame,
-    task_parameters: Any,
     *,
     metadata: dict[str, Any] | None = None,
 ) -> NdxEventsNWBFile:
@@ -90,11 +89,9 @@ def assemble_nwbfile(
     Parameters
     ----------
     pkl : loaded behavior pickle (identity/subject/warm-up source).
-    events_df : point-events frame from ``build_trials_and_events``.
-    intervals_df : flat intervals frame from ``build_trials_and_events``.
+    session : the :class:`~.load_data.session_data.SessionData` from
+        ``build_trials_and_events`` (events/intervals + task parameters).
     wheel_df : running-wheel df from ``compute_running_speed``.
-    task_parameters : the ``ChangeDetectionTaskParameters`` lab-metadata
-        object from ``build_trials_and_events``.
     metadata : optional identity/subject override dict (see
         :func:`~camstim_behavior_processing.nwb.file.build_nwbfile`).
 
@@ -102,8 +99,11 @@ def assemble_nwbfile(
     -------
     The fully-populated :class:`~ndx_events.NdxEventsNWBFile`.
     """
+    events_df = session.events_df
+    intervals_df = session.intervals_df
+
     nwb = build_nwbfile(pkl, metadata)
-    nwb.add_lab_meta_data(task_parameters)
+    nwb.add_lab_meta_data(session.task_parameters)
     nwb.add_lab_meta_data(
         HedLabMetaData(hed_schema_version=HED_SCHEMA_VERSION)
     )
@@ -180,20 +180,13 @@ def package_nwb(
     The assembled :class:`~ndx_events.NdxEventsNWBFile` (always returned;
     written only when ``output_path`` is given).
     """
-    built = build_trials_and_events(pkl_path, sync_path)
+    session = build_trials_and_events(pkl_path, sync_path)
     pkl = load_stim_pkl(pkl_path)
     wheel_df = compute_running_speed(
-        pkl, built["timestamp_data"]["stim_vsync_fall"]
+        pkl, session.timestamp_data["stim_vsync_fall"]
     )
 
-    nwb = assemble_nwbfile(
-        pkl,
-        built["events_df"],
-        built["intervals_df"],
-        wheel_df,
-        built["task_parameters"],
-        metadata=metadata,
-    )
+    nwb = assemble_nwbfile(pkl, session, wheel_df, metadata=metadata)
 
     if output_path is not None:
         output_path = Path(output_path)

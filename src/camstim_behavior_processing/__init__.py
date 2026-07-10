@@ -17,10 +17,11 @@ does not require pynwb.
 
 from __future__ import annotations
 
-from .load_data import build_trials_and_events
+from .load_data import SessionData, build_trials_and_events
 
 __all__ = [
     "build_trials_and_events",
+    "SessionData",
     "compute_running_speed",
     "package_nwb",
     "build_nwbfile",

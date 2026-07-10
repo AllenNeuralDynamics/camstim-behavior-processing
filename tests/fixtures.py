@@ -14,6 +14,8 @@ import numpy as np
 import pandas as pd
 from pynwb.file import LabMetaData
 
+from camstim_behavior_processing.load_data import SessionData
+
 _EVENT_COLS = [
     "timestamp",
     "event_type",
@@ -277,3 +279,13 @@ def make_wheel_df(n: int = 660, span: float = 11.0) -> pd.DataFrame:
 def make_task_parameters() -> LabMetaData:
     """Build a stand-in task-parameters lab-metadata object."""
     return LabMetaData(name="task_parameters")
+
+
+def make_session(n: int = 660, span: float = 11.0) -> SessionData:
+    """Bundle the synthetic frames into a :class:`SessionData`."""
+    return SessionData(
+        events_df=make_events_df(),
+        intervals_df=make_intervals_df(),
+        timestamp_data={"stim_vsync_fall": np.linspace(0, span, n)},
+        task_parameters=make_task_parameters(),
+    )

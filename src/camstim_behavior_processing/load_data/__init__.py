@@ -1,12 +1,12 @@
 """Intermediate-DataFrame builders for a change-detection session.
 
-Pure data layer — no NWB packaging lives here. Three composable building
-blocks turn a raw camstim session (``*_stim.pkl`` + ``*_sync.h5``) into
-analysis-ready pandas tables that the :mod:`camstim_behavior_processing.nwb`
-layer consumes:
+Pure data layer — no NWB packaging lives here. Composable building blocks turn
+a raw camstim session (``*_stim.pkl`` + ``*_sync.h5``) into analysis-ready
+pandas tables that the :mod:`camstim_behavior_processing.nwb` layer consumes:
 
-- :func:`build_trials_and_events` (``trials_events``) — events_df, trials_df,
-  intervals_df. numpy / pandas / h5py only.
+- :func:`build_trials_and_events` (``trials_events``) — returns a
+  :class:`SessionData` (events_df, intervals_df, timestamp_data,
+  task_parameters, + the derived trials_df view). numpy / pandas / h5py only.
 - :func:`compute_running_speed` (``running_speed``) — the wheel df. Adds scipy.
 - :func:`load_stim_pkl` (``loaders``) — read the raw behavior pickle.
 
@@ -17,10 +17,12 @@ trials/events builder does not require scipy.
 from __future__ import annotations
 
 from .loaders import load_stim_pkl
+from .session_data import SessionData
 from .trials_events import build_trials_and_events
 
 __all__ = [
     "build_trials_and_events",
+    "SessionData",
     "compute_running_speed",
     "load_stim_pkl",
 ]

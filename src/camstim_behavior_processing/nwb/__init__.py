@@ -19,7 +19,10 @@ the task-parameter lab metadata) into a fully-populated
 :func:`assemble_nwbfile` builds the NWBFile from already-loaded DataFrames;
 :func:`package_nwb` is the one-call path (raw ``*_stim.pkl`` / ``*_sync.h5`` ->
 intermediates -> assembled NWB, written as NWB-Zarr by default) and also emits
-the BIDS-style ``*.events.json`` sidecar.
+the BIDS-style ``*.events.json`` sidecar. :func:`package_session` is the
+type-agnostic entry point: it inspects the pkl and dispatches to
+:func:`package_nwb` (change-detection) or :func:`package_sweepstim_nwb`
+(passive SweepStim).
 """
 
 from __future__ import annotations
@@ -37,6 +40,7 @@ from pynwb import NWBHDF5IO
 from ..load_data.loaders import load_stim_pkl
 from ..load_data.running_speed import compute_running_speed
 from ..load_data.session_data import SessionData
+from ..load_data.sweepstim import classify_sweepstim_session
 from ..load_data.trials_events import build_trials_and_events
 from .acquisition import add_running_speed
 from .epochs import build_epoch_lookup
@@ -73,6 +77,7 @@ __all__ = [
     "build_nwbfile",
     "assemble_nwbfile",
     "package_nwb",
+    "package_session",
     "assemble_sweepstim_nwbfile",
     "build_sweepstim_nwbfile",
     "build_sweepstim_sidecar",
@@ -204,3 +209,49 @@ def package_nwb(
         if write_sidecar:
             _write_sidecar(output_path)
     return nwb
+
+
+def package_session(
+    pkl_path: str | Path,
+    sync_path: str | Path,
+    *,
+    output_path: str | Path | None = None,
+    metadata: dict[str, Any] | None = None,
+    fmt: str = "zarr",
+    write_sidecar: bool = True,
+) -> NdxEventsNWBFile:
+    """Package one session into NWB, auto-routing on its pkl structure.
+
+    Inspects the raw ``*.pkl`` with
+    :func:`~camstim_behavior_processing.load_data.classify_sweepstim_session`
+    and delegates to :func:`package_sweepstim_nwb` for a passive SweepStim
+    session or :func:`package_nwb` for an active change-detection session. All
+    keyword arguments are forwarded unchanged, so a mixed batch can be packaged
+    through this single entry point without knowing each session's type.
+
+    Parameters
+    ----------
+    pkl_path : path to the camstim ``*.pkl``.
+    sync_path : path to the ``*_sync.h5`` sync file.
+    output_path : if given, the assembled NWB is written here. When ``None``,
+        nothing is written and no sidecar is emitted.
+    metadata : optional identity/subject override dict.
+    fmt : output format, ``"zarr"`` (default) or ``"hdf5"``.
+    write_sidecar : if True (and ``output_path`` is given), also write the
+        BIDS-style ``*.events.json`` sidecar next to the NWB.
+
+    Returns
+    -------
+    The assembled :class:`~ndx_events.NdxEventsNWBFile`.
+    """
+    pkl = load_stim_pkl(pkl_path)
+    is_sweepstim, _ = classify_sweepstim_session(pkl)
+    packager = package_sweepstim_nwb if is_sweepstim else package_nwb
+    return packager(
+        pkl_path,
+        sync_path,
+        output_path=output_path,
+        metadata=metadata,
+        fmt=fmt,
+        write_sidecar=write_sidecar,
+    )

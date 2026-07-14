@@ -35,10 +35,16 @@ __all__ = [
     "package_nwb",
     "build_nwbfile",
     "package_sweepstim_nwb",
+    "package_session",
 ]
 
 # pynwb-dependent names re-exported lazily (see __getattr__).
-_LAZY_NWB_NAMES = ("package_nwb", "build_nwbfile", "package_sweepstim_nwb")
+_LAZY_NWB_NAMES = (
+    "package_nwb",
+    "build_nwbfile",
+    "package_sweepstim_nwb",
+    "package_session",
+)
 
 
 def __getattr__(name):

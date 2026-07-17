@@ -71,7 +71,7 @@ groups:
     required: false
   - name: flash_omit_probability
     dtype: float
-    doc: Fraction of stimulus flashes that are intentionally omitted.
+    doc: Fraction of non-change stimulus flashes that are intentionally omitted.
     required: false
   - name: reward_volume_ml
     dtype: float

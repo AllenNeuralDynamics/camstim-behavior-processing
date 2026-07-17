@@ -1,8 +1,8 @@
 groups:
 - neurodata_type_def: ChangeDetectionTaskParameters
   neurodata_type_inc: LabMetaData
-  doc: Task parameters for the visual change-detection task (images / gratings, 
-    response-window detection paradigm).
+  doc: Task parameters for the visual change-detection task images / gratings, 
+    response-window detection paradigm.
   attributes:
   - name: change_flashes_min
     dtype: int

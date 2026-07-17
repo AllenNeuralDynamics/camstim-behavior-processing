@@ -91,7 +91,7 @@ groups:
     required: false
   - name: free_reward_trials
     dtype: int
-    doc: Number of warm-up trials at the start that are auto-rewarded.
+    doc: Number of miss trials after which a free reward is given as a prompt for mouse to re-engage with the task.
     required: false
   - name: warm_up_trials
     dtype: int

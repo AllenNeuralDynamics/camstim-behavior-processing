@@ -55,7 +55,7 @@ groups:
     required: false
   - name: stimulus_class
     dtype: text
-    doc: 'Class of stimulus presented. Typical values: images, gratings.'
+    doc: 'Class of stimulus presented. Typical values: images, gratings.''
     required: false
   - name: image_set_name
     dtype: text
@@ -95,7 +95,7 @@ groups:
     required: false
   - name: warm_up_trials
     dtype: int
-    doc: Number of warm-up trials with reduced difficulty at session start.
+    doc: Number of warm-up trials at session start where mice receive free rewards upon stimulus change.
     required: false
   - name: session_type
     dtype: text

@@ -15,7 +15,7 @@ groups:
     required: false
   - name: change_time_distribution
     dtype: text
-    doc: 'Distribution used to draw change times. Typical values: "geometric", "exponential".'
+    doc: 'Distribution used to draw change times. Typical values: geometric, exponential.'
     required: false
   - name: change_time_scale
     dtype: float

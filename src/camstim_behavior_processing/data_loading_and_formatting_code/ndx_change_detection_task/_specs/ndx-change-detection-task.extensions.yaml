@@ -44,18 +44,18 @@ groups:
   - name: catch_frequency
     dtype: float
     doc: Fraction of trials that are catch trials (no change). Only set when 
-      catch_mode is "explicit"; omitted when catch_mode is "implicit".
+      catch_mode is "explicit"; omitted when catch_mode is implicit.
     required: false
   - name: catch_mode
     dtype: text
-    doc: 'How catch trials are produced. "explicit": each trial has a fixed catch_frequency
-      probability of being a catch trial. "implicit": sham changes are drawn from
+    doc: 'How catch trials are produced. explicit: each trial has a fixed catch_frequency
+      probability of being a catch trial. implicit: sham changes are drawn from
       the change-time distribution and occur on trials that end before the drawn change
       time.'
     required: false
   - name: stimulus_class
     dtype: text
-    doc: 'Class of stimulus presented. Typical values: "images", "gratings".'
+    doc: 'Class of stimulus presented. Typical values: images, gratings.'
     required: false
   - name: image_set_name
     dtype: text

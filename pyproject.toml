@@ -4,19 +4,37 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "camstim-behavior-processing"
-description = "Generated from aind-library-template"
+description = "Turn a raw camstim change-detection session (*_stim.pkl + *_sync.h5) into analysis-ready pandas tables and a complete HED-annotated NWB file."
 license = "MIT"
 requires-python = ">=3.10"
 authors = [
     {name = "Allen Institute for Neural Dynamics"}
 ]
 classifiers = [
-    "Programming Language :: Python :: 3"
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
 ]
 readme = "README.md"
 version = "0.0.0"
 
 dependencies = [
+    "numpy",
+    "pandas",
+    "h5py",
+    "scipy",
+    # pynwb 4.0 moved events/HED into core, so the standalone ndx-events
+    # NdxEventsNWBFile collides with the native `events` field
+    # ("names duplicated: ['events']"). This library targets the standalone
+    # ndx-events/ndx-hed on the pynwb 3.x line; cap until it migrates to
+    # pynwb's built-in events/HED.
+    "pynwb>=3.1,<4",
+    "hdmf-zarr>=0.13",
+    "ndx-events>=0.4,<0.5",
+    "ndx-hed>=0.2,<0.3",
 ]
 
 [dependency-groups]
@@ -32,6 +50,14 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+camstim_behavior_processing = [
+    "py.typed",
+    "data_loading_and_formatting_code/*.py",
+    "data_loading_and_formatting_code/ndx_change_detection_task/__init__.py",
+    "data_loading_and_formatting_code/ndx_change_detection_task/_specs/*.yaml",
+]
 
 [tool.black]
 line-length = 79
@@ -74,5 +100,13 @@ profile = "black"
 skip = [".conda", ".venv"]
 
 [tool.interrogate]
-exclude = ["setup.py", "docs", "build", ".conda"]
+exclude = [
+    "setup.py",
+    "docs",
+    "build",
+    ".conda",
+    # Adopted-from-capsule extractor; not yet refactored to this repo's style.
+    # Glob (not a path) so it matches regardless of OS path separator.
+    "*data_loading_and_formatting_code*",
+]
 fail-under = 100

@@ -1,0 +1,13 @@
+namespaces:
+- author:
+  - Change-detection NWB+HED project
+  contact:
+  - n/a
+  doc: NWB extension for change detection task parameters.
+  name: ndx-change-detection-task
+  schema:
+  - namespace: core
+    neurodata_types:
+    - LabMetaData
+  - source: ndx-change-detection-task.extensions.yaml
+  version: 0.1.0

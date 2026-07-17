@@ -1,9 +1,13 @@
 [flake8]
+# E203 (whitespace before ':') conflicts with black's slice formatting.
+extend-ignore = E203
 exclude =
     .git,
     __pycache__,
     build,
     .venv,
-    venv, 
-    .conda
+    venv,
+    .conda,
+    # Adopted-from-capsule extractor; not yet refactored to this repo's style.
+    src/camstim_behavior_processing/data_loading_and_formatting_code
 max-complexity = 10

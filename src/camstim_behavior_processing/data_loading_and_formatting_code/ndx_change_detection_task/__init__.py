@@ -87,7 +87,7 @@ _SCALAR_FIELDS = [
     ('blank_duration_sec', 'float',
      'Duration of the gray-screen gap between flashes (seconds).'),
     ('flash_omit_probability', 'float',
-     'Fraction of stimulus flashes that are intentionally omitted.'),
+     'Fraction of non-change stimulus flashes that are intentionally omitted.'),
 
     # Reward
     ('reward_volume_ml', 'float',
@@ -99,9 +99,11 @@ _SCALAR_FIELDS = [
     ('volume_limit_ml', 'float',
      'Maximum total reward volume per session (mL).'),
     ('free_reward_trials', 'int',
-     'Number of warm-up trials at the start that are auto-rewarded.'),
+     'Number of miss trials after which a free reward is given as a '
+     'prompt for mouse to re-engage with the task.'),
     ('warm_up_trials', 'int',
-     'Number of warm-up trials with reduced difficulty at session start.'),
+     'Number of warm-up trials at session start where mice receive '
+     'free rewards upon stimulus change.'),
 
     # Session
     ('session_type', 'text',

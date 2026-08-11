@@ -3,7 +3,7 @@
 This subpackage is the NWB-packaging layer. It turns the ``load_data``
 intermediates (events / trials / intervals DataFrames + the running-wheel df +
 the task-parameter lab metadata) into a fully-populated
-:class:`~ndx_events.NdxEventsNWBFile`:
+:class:`~pynwb.NWBFile`:
 
     NWBFile
     |-- lab_meta_data (task_parameters + hed_schema)
@@ -13,7 +13,7 @@ the task-parameter lab metadata) into a fully-populated
     |   |-- intervals               (intervals.build_intervals_table)
     |   |-- stimulus_presentations  (stimulus.*)
     |   +-- natural_movie_one_presentations
-    |-- events (ndx-events EventsTable)   (events.build_events_table)
+    |-- events (pynwb EventsTable)  (events.build_events_table)
     +-- acquisition + processing/running  (acquisition.add_running_speed)
 
 :func:`assemble_nwbfile` builds the NWBFile from already-loaded DataFrames;
@@ -33,8 +33,8 @@ from typing import Any
 
 import pandas as pd
 from hdmf_zarr.nwb import NWBZarrIO
-from ndx_events import NdxEventsNWBFile
 from ndx_hed import HedLabMetaData
+from pynwb import NWBFile
 from pynwb import NWBHDF5IO
 
 from ..load_data.loaders import load_stim_pkl
@@ -98,7 +98,7 @@ def assemble_nwbfile(
     wheel_df: pd.DataFrame,
     *,
     metadata: dict[str, Any] | None = None,
-) -> NdxEventsNWBFile:
+) -> NWBFile:
     """Assemble a complete NWBFile from the loaded intermediates.
 
     Parameters
@@ -112,7 +112,7 @@ def assemble_nwbfile(
 
     Returns
     -------
-    The fully-populated :class:`~ndx_events.NdxEventsNWBFile`.
+    The fully-populated :class:`~pynwb.NWBFile`.
     """
     events_df = session.events_df
     intervals_df = session.intervals_df
@@ -132,7 +132,7 @@ def assemble_nwbfile(
     return nwb
 
 
-def _write_nwb(nwb: NdxEventsNWBFile, output_path: Path, fmt: str) -> None:
+def _write_nwb(nwb: NWBFile, output_path: Path, fmt: str) -> None:
     """Write ``nwb`` to ``output_path`` as NWB-Zarr or HDF5.
 
     Parameters
@@ -172,7 +172,7 @@ def package_nwb(
     metadata: dict[str, Any] | None = None,
     fmt: str = "zarr",
     write_sidecar: bool = True,
-) -> NdxEventsNWBFile:
+) -> NWBFile:
     """Package one change-detection session into a complete NWB file.
 
     Loads the raw ``*_stim.pkl`` / ``*_sync.h5``, builds every intermediate,
@@ -192,7 +192,7 @@ def package_nwb(
 
     Returns
     -------
-    The assembled :class:`~ndx_events.NdxEventsNWBFile` (always returned;
+    The assembled :class:`~pynwb.NWBFile` (always returned;
     written only when ``output_path`` is given).
     """
     session = build_trials_and_events(pkl_path, sync_path)
@@ -219,7 +219,7 @@ def package_session(
     metadata: dict[str, Any] | None = None,
     fmt: str = "zarr",
     write_sidecar: bool = True,
-) -> NdxEventsNWBFile:
+) -> NWBFile:
     """Package one session into NWB, auto-routing on its pkl structure.
 
     Inspects the raw ``*.pkl`` with
@@ -242,7 +242,7 @@ def package_session(
 
     Returns
     -------
-    The assembled :class:`~ndx_events.NdxEventsNWBFile`.
+    The assembled :class:`~pynwb.NWBFile`.
     """
     pkl = load_stim_pkl(pkl_path)
     is_sweepstim, _ = classify_sweepstim_session(pkl)

@@ -18,8 +18,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 from hdmf.common import VectorData
-from ndx_events import NdxEventsNWBFile
 from ndx_hed import HedTags
+from pynwb import NWBFile
 from pynwb.epoch import TimeIntervals
 
 from . import hed_tags as H
@@ -98,7 +98,7 @@ _TRIAL_COLUMNS = [
 ]
 
 
-def _declare_trial_columns(nwb: NdxEventsNWBFile) -> None:
+def _declare_trial_columns(nwb: NWBFile) -> None:
     """Declare the custom trials columns (including the HED column)."""
     for name, desc in _TRIAL_COLUMNS:
         nwb.add_trial_column(name=name, description=desc)
@@ -125,7 +125,7 @@ def _window_maps(intervals_df: pd.DataFrame) -> tuple[dict, dict]:
 
 
 def _add_one_trial(
-    nwb: NdxEventsNWBFile,
+    nwb: NWBFile,
     row: pd.Series,
     cw_t: tuple,
     rw_t: tuple,
@@ -170,11 +170,11 @@ def _add_one_trial(
 
 
 def add_trials(
-    nwb: NdxEventsNWBFile,
+    nwb: NWBFile,
     intervals_df: pd.DataFrame,
     warm_up_n: int,
     epoch_list: list[dict] | None = None,
-) -> NdxEventsNWBFile:
+) -> NWBFile:
     """Populate ``nwb.trials`` from the trial rows of ``intervals_df``.
 
     Parameters
@@ -426,10 +426,10 @@ def build_intervals_table(
 
 
 def add_intervals(
-    nwb: NdxEventsNWBFile,
+    nwb: NWBFile,
     intervals_df: pd.DataFrame,
     events_df: pd.DataFrame,
-) -> NdxEventsNWBFile:
+) -> NWBFile:
     """Add the flat ``intervals`` table to ``nwb``.
 
     Parameters

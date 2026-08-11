@@ -80,8 +80,8 @@ def add_running_speed(nwb: NWBFile, wheel_df: pd.DataFrame) -> NWBFile:
             name="running", description="Running speed processing module"
         )
         nwb.add_processing_module(mod)
-    mod.add_data_interface(speed_ts)
-    mod.add_data_interface(dx_ts)
+    mod.add(speed_ts)
+    mod.add(dx_ts)
     nwb.add_acquisition(v_sig_ts)
     nwb.add_acquisition(v_in_ts)
     return nwb

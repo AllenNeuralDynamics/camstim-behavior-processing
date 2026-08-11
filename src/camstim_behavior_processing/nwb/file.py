@@ -1,10 +1,10 @@
 """Build the NWBFile shell (identity + subject) for a session.
 
 Consumes the raw behavior pickle (loaded dict) to populate the NWB identity
-fields (``session_start_time`` and the ``Subject``) and returns an
-:class:`~ndx_events.NdxEventsNWBFile` so the ndx-events ``EventsTable`` can be
-attached downstream. An optional ``metadata`` override dict supplies fields the
-pkl does not carry (experimenter, institution, subject age/sex/genotype, ...).
+fields (``session_start_time`` and the ``Subject``) and returns a
+:class:`~pynwb.NWBFile`. An optional ``metadata`` override dict supplies
+fields the pkl does not carry (experimenter, institution, subject
+age/sex/genotype, ...).
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ import datetime
 from typing import Any
 from uuid import uuid4
 
-from ndx_events import NdxEventsNWBFile
+from pynwb import NWBFile
 from pynwb.file import Subject
 
 
@@ -63,8 +63,8 @@ def build_subject(pkl: dict, metadata: dict[str, Any]) -> Subject:
 
 def build_nwbfile(
     pkl: dict, metadata: dict[str, Any] | None = None
-) -> NdxEventsNWBFile:
-    """Create an empty NdxEventsNWBFile with identity + subject metadata.
+) -> NWBFile:
+    """Create an empty :class:`~pynwb.NWBFile` with identity + subject.
 
     Parameters
     ----------
@@ -77,7 +77,7 @@ def build_nwbfile(
 
     Returns
     -------
-    An :class:`~ndx_events.NdxEventsNWBFile` with no data yet.
+    A :class:`~pynwb.NWBFile` with no data yet.
     """
     metadata = metadata or {}
     params = pkl["items"]["behavior"]["params"]
@@ -87,7 +87,7 @@ def build_nwbfile(
     if start_time.tzinfo is None:
         start_time = start_time.replace(tzinfo=datetime.timezone.utc)
 
-    nwb = NdxEventsNWBFile(
+    nwb = NWBFile(
         session_description=metadata.get(
             "session_description", params.get("stage", "change detection")
         ),

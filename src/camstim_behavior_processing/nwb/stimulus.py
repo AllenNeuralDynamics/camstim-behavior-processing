@@ -16,8 +16,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 from hdmf.common import VectorData
-from ndx_events import NdxEventsNWBFile
 from ndx_hed import HedTags
+from pynwb import NWBFile
 from pynwb.epoch import TimeIntervals
 
 from . import hed_tags as H
@@ -346,10 +346,10 @@ def build_natural_movie_one_presentations(
 
 
 def add_stimulus_presentations(
-    nwb: NdxEventsNWBFile,
+    nwb: NWBFile,
     events_df: pd.DataFrame,
     epoch_list: list[dict] | None = None,
-) -> NdxEventsNWBFile:
+) -> NWBFile:
     """Add the stimulus_presentations (and movie, if any) tables to ``nwb``.
 
     Parameters

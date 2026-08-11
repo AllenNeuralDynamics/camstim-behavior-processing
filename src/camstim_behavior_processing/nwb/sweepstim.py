@@ -5,7 +5,7 @@ mirroring the change-detection :mod:`camstim_behavior_processing.nwb` writers
 but for the simpler passive structure (no trials / events tables — only
 stimulus presentations and epochs):
 
-    NdxEventsNWBFile
+    NWBFile
     |-- lab_meta_data (hed_schema)
     |-- subject
     |-- intervals
@@ -30,8 +30,8 @@ from uuid import uuid4
 import pandas as pd
 from hdmf.common import VectorData
 from hdmf_zarr.nwb import NWBZarrIO
-from ndx_events import NdxEventsNWBFile
 from ndx_hed import HedLabMetaData, HedTags
+from pynwb import NWBFile
 from pynwb import NWBHDF5IO
 from pynwb.epoch import TimeIntervals
 from pynwb.file import Subject
@@ -100,8 +100,8 @@ def _subject_id_from_pkl(pkl: dict) -> str:
 
 def build_sweepstim_nwbfile(
     pkl: dict, metadata: dict[str, Any] | None = None
-) -> NdxEventsNWBFile:
-    """Create an NdxEventsNWBFile (identity + subject) for a passive session.
+) -> NWBFile:
+    """Create an NWBFile (identity + subject) for a passive session.
 
     Parameters
     ----------
@@ -115,10 +115,10 @@ def build_sweepstim_nwbfile(
 
     Returns
     -------
-    An :class:`~ndx_events.NdxEventsNWBFile` with no data yet.
+    A :class:`~pynwb.NWBFile` with no data yet.
     """
     metadata = metadata or {}
-    nwb = NdxEventsNWBFile(
+    nwb = NWBFile(
         session_description=metadata.get(
             "session_description",
             pkl.get("stage", "sweepstim_passive"),
@@ -379,7 +379,7 @@ def assemble_sweepstim_nwbfile(
     wheel_df: pd.DataFrame,
     *,
     metadata: dict[str, Any] | None = None,
-) -> NdxEventsNWBFile:
+) -> NWBFile:
     """Assemble a complete passive-session NWBFile from the intermediates.
 
     Parameters
@@ -391,7 +391,7 @@ def assemble_sweepstim_nwbfile(
 
     Returns
     -------
-    The fully-populated :class:`~ndx_events.NdxEventsNWBFile`.
+    The fully-populated :class:`~pynwb.NWBFile`.
     """
     nwb = build_sweepstim_nwbfile(pkl, metadata)
     nwb.add_lab_meta_data(
@@ -409,7 +409,7 @@ def assemble_sweepstim_nwbfile(
     return nwb
 
 
-def _write_nwb(nwb: NdxEventsNWBFile, output_path: Path, fmt: str) -> None:
+def _write_nwb(nwb: NWBFile, output_path: Path, fmt: str) -> None:
     """Write ``nwb`` to ``output_path`` as NWB-Zarr or HDF5."""
     if fmt == "zarr":
         with NWBZarrIO(str(output_path), mode="w") as io:
@@ -438,7 +438,7 @@ def package_sweepstim_nwb(
     metadata: dict[str, Any] | None = None,
     fmt: str = "zarr",
     write_sidecar: bool = True,
-) -> NdxEventsNWBFile:
+) -> NWBFile:
     """Package one passive SweepStim session into a complete NWB file.
 
     Loads the raw ``*.pkl`` / ``*_sync.h5``, verifies the session is passive,
@@ -458,7 +458,7 @@ def package_sweepstim_nwb(
 
     Returns
     -------
-    The assembled :class:`~ndx_events.NdxEventsNWBFile`.
+    The assembled :class:`~pynwb.NWBFile`.
 
     Raises
     ------

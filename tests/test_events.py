@@ -1,8 +1,8 @@
-"""Tests for the ndx-events EventsTable builder."""
+"""Tests for the pynwb EventsTable builder."""
 
 import unittest
 
-from ndx_events import EventsTable
+from pynwb.event import EventsTable
 
 from camstim_behavior_processing.nwb.events import (
     add_events,
